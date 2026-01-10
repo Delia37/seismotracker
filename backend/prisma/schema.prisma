@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  password String  @db.VarChar(300)
+  fullName String  @db.VarChar(300)
+  isAdmin  Boolean @default(false)
+
+  tickets           Ticket[]       @relation("TicketCreator")
+  notifications     Notification[]
+  addedBuildings    Building[]     @relation("AddedBuildings")
+  favoriteBuildings Building[]     @relation("FavoriteBuildings")
+  Building          Building[]
+  Ticket            Ticket[]
+}
+
+model Building {
+  id             Int            @id @default(autoincrement())
+  buildingYear   Int
+  heightRegime   String
+  numApartments  Int?
+  analysisYear   Int
+  buildingStatus String         @default("pending")
+  technicExpert  String         @db.VarChar(300)
+  seismicRiskId  Int
+  userId         Int?
+  adminId        Int?
+  approvedBy     User?          @relation(fields: [adminId], references: [id])
+  seismicRisk    SeismicRisk    @relation(fields: [seismicRiskId], references: [id])
+  addedBy        User?          @relation("AddedBuildings", fields: [userId], references: [id])
+  location       Location?
+  notifications  Notification[]
+  tickets        Ticket[]
+  savedBy        User[]         @relation("FavoriteBuildings")
+}
+
+model Location {
+  id         Int      @id @default(autoincrement())
+  street     String   @db.VarChar(300)
+  number     String?
+  sector     Int
+  latitude   Float?   @default(0)
+  longitude  Float?   @default(0)
+  thumbnail  String?
+  buildingId Int      @unique
+  building   Building @relation(fields: [buildingId], references: [id])
+}
+
+model SeismicRisk {
+  id          Int        @id @default(autoincrement())
+  className   String     @unique
+  description String     @db.VarChar(512)
+  buildings   Building[]
+}
+
+model Ticket {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String   @db.VarChar(1024)
+  category    String
+  docs        String[]
+  buildingId  Int
+  userId      Int
+  adminId     Int?
+  isClosed    Boolean  @default(false)
+  closedBy    User?     @relation(fields: [adminId], references: [id])
+  building    Building @relation(fields: [buildingId], references: [id])
+  user        User     @relation("TicketCreator", fields: [userId], references: [id])
+}
+
+model Notification {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  buildingId  Int
+  userId      Int
+  building    Building @relation(fields: [buildingId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+}
