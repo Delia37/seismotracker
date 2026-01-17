@@ -86,7 +86,12 @@ export class UsersService {
           id: userId,
         },
         include: {
-          favoriteBuildings: true,
+          favoriteBuildings: {
+            include: {
+              location: true,
+              seismicRisk: true,
+            },
+          },
         },
       });
 

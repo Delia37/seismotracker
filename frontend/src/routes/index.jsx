@@ -13,6 +13,8 @@ import NewBuildings from "../views/new-buildings/index.jsx";
 import Unauthorized from "../views/unauthorized/index.jsx";
 import Ticket from "../views/tickets/index.jsx";
 import MyBuildings from "../views/my_buildings/index.jsx";
+import SavedBuildings from "../views/saved_buildings/index.jsx";
+
 
 function generateRoutes() {
   return [
@@ -56,6 +58,16 @@ function generateRoutes() {
               <Unauthorized />
             ),
         },
+        {
+          path: "/saved",
+          element:
+            localStorage.getItem("user") !== null ? (
+              <SavedBuildings />
+            ) : (
+              <Unauthorized />
+            ),
+        },
+
       ],
     },
     {
