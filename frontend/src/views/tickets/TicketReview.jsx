@@ -25,21 +25,6 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function PatchStatus(id, toast, navigate, setButtonLoading, adminId) {
   setButtonLoading(true);
-<<<<<<< HEAD
-  fetch(`http://localhost:3000/tickets/${id}`, {
-    method: "PATCH",
-    mode: "cors",
-    credentials: "same-origin",
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("user")}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ isClosed: true, adminId: parseInt(adminId) }),
-  }).then(async (res) => {
-    const data = await res.text();
-
-    if (data.includes("updated")) {
-=======
 
   try {
     const res = await fetch(`http://localhost:3000/tickets/${id}`, {
@@ -56,21 +41,10 @@ async function PatchStatus(id, toast, navigate, setButtonLoading, adminId) {
     const text = await res.text(); // poate fi JSON, dar nu ne trebuie conținutul
 
     if (res.ok) {
->>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
       toast({
         position: "top",
         render: () => (
           <Box color="white" p={3} bg="teal.800" textAlign="center">
-<<<<<<< HEAD
-            Actualizarea a reusit! Vei fi redirectat la pagina de cladiri noi.
-          </Box>
-        ),
-      });
-      await sleep(3000);
-      toast.closeAll();
-      navigate("/new");
-    } else {
-=======
             Ticket închis cu succes!
           </Box>
         ),
@@ -81,22 +55,10 @@ async function PatchStatus(id, toast, navigate, setButtonLoading, adminId) {
       navigate("/tickets");
     } else {
       // aici e eroare reală (401/500 etc)
->>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
       toast({
         position: "top",
         render: () => (
           <Box color="white" p={3} bg="pink.800" textAlign="center">
-<<<<<<< HEAD
-            Internal server error!
-          </Box>
-        ),
-      });
-      await sleep(3000);
-      setButtonLoading(false);
-    }
-  });
-}
-=======
             Eroare la închiderea ticket-ului: {text}
           </Box>
         ),
@@ -159,7 +121,6 @@ async function PatchStatus(id, toast, navigate, setButtonLoading, adminId) {
 //     }
 //   });
 // }
->>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
 // eslint-disable-next-line react/prop-types
 function BuildingForm({ onSubmit, buildingId, ticketId }) {
   const toast = useToast();

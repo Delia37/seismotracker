@@ -6,10 +6,7 @@ import {
   CardFooter,
   Heading,
   HStack,
-<<<<<<< HEAD
-=======
   IconButton,
->>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
   Image,
   Spacer,
   Stack,
@@ -22,11 +19,8 @@ import {
   BsFill2CircleFill,
   BsFill3CircleFill,
   BsFillPatchQuestionFill,
-<<<<<<< HEAD
-=======
   BsHeart,
   BsHeartFill,
->>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
 } from "react-icons/bs";
 
 function getRisk(seismicRisk) {
@@ -65,14 +59,11 @@ export function BuildingCard({
   seismicToolTip,
   thumbnail,
   navigate,
-<<<<<<< HEAD
-=======
 
   // NEW:
   isSaved,
   onToggleSave,
   canSave,
->>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
 }) {
   const currentYear = new Date().getFullYear();
 
@@ -87,9 +78,6 @@ export function BuildingCard({
       }}
       cursor="pointer"
       onClick={() => navigate(`/buildings/${id}`)}
-<<<<<<< HEAD
-    >
-=======
       position="relative"
     >
       {/* NEW: Save button */}
@@ -112,7 +100,6 @@ export function BuildingCard({
         </Tooltip>
       )}
 
->>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
       <CardBody>
         <Image src={thumbnail} alt="Building thumbnail" borderRadius="lg" />
         <Stack mt="6" spacing="3">
@@ -132,10 +119,6 @@ export function BuildingCard({
           )}
         </Stack>
       </CardBody>
-<<<<<<< HEAD
-=======
-
->>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
       <CardFooter>
         <Box>
           <Text color="teal.600" fontSize="xl">
@@ -165,8 +148,6 @@ BuildingCard.propTypes = {
   seismicRisk: PropTypes.string.isRequired,
   seismicToolTip: PropTypes.string.isRequired,
   navigate: PropTypes.func.isRequired,
-<<<<<<< HEAD
-=======
 
   // NEW:
   isSaved: PropTypes.bool,
@@ -178,5 +159,4 @@ BuildingCard.defaultProps = {
   isSaved: false,
   onToggleSave: () => {},
   canSave: false,
->>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
 };

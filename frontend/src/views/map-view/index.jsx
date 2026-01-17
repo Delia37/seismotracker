@@ -274,19 +274,11 @@ export default function MapView() {
         async (res) => res.json()
       ),
   });
-<<<<<<< HEAD
 const { isLoaded } = useJsApiLoader({
   googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
   libraries: ["places"],
 });
 
-=======
-
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyBM4CEzkbnWFZ84JceDEzWncHQJTApSnOI",
-    libraries: ["places"],
-  });
->>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
 
   if (!isLoaded) {
     return <SkeletonText />;

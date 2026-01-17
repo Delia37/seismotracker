@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import React from "react";
-import { BuildingCard } from "./BuildingCard.jsx";
-import { Box, Grid, GridItem, Spinner } from "@chakra-ui/react";
-import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-
-export function BuildingsGrid(buildings, navigate) {
-=======
 // import React from "react";
 // import { BuildingCard } from "./BuildingCard.jsx";
 // import { Box, Grid, GridItem, Spinner } from "@chakra-ui/react";
@@ -223,7 +214,6 @@ export function BuildingsGrid(buildings, navigate, opts = {}) {
     onToggleSave = () => {},
   } = opts;
 
->>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
   return (
     <Box mt={5}>
       <Grid templateColumns="repeat(5, 1fr)" gap={8}>
@@ -231,13 +221,7 @@ export function BuildingsGrid(buildings, navigate, opts = {}) {
           <GridItem key={building.id}>
             <BuildingCard
               id={building.id}
-<<<<<<< HEAD
-              address={
-                building.location.street + " " + building.location.number
-              }
-=======
               address={building.location.street + " " + building.location.number}
->>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
               buildingStatus={building.buildingStatus}
               year={building.buildingYear}
               heightRegime={building.heightRegime}
@@ -246,13 +230,10 @@ export function BuildingsGrid(buildings, navigate, opts = {}) {
               seismicToolTip={building.seismicRisk.description}
               thumbnail={building.location.thumbnail}
               navigate={navigate}
-<<<<<<< HEAD
-=======
               // inimioara
               canSave={canSave}
               isSaved={favoriteIds.has(building.id)}
               onToggleSave={onToggleSave}
->>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
             />
           </GridItem>
         ))}
@@ -261,19 +242,6 @@ export function BuildingsGrid(buildings, navigate, opts = {}) {
   );
 }
 
-<<<<<<< HEAD
-export default function LandingPage() {
-  const navigate = useNavigate();
-  const { isLoading, data, error } = useQuery({
-    queryKey: ["Building"],
-    queryFn: () =>
-      fetch("http://localhost:3000/buildings?skip=0&take=1000").then(
-        async (res) => res.json()
-      ),
-  });
-
-  if (isLoading || data === "undefined")
-=======
 // parsează și JSON și text/plain
 async function parseAny(res) {
   const text = await res.text();
@@ -387,17 +355,11 @@ export default function LandingPage() {
 
   // render states
   if (isLoading || data === "undefined") {
->>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
     return (
       <Box p={15}>
         <Spinner />
       </Box>
     );
-<<<<<<< HEAD
-  if (error) return "Error" + error.message;
-
-  return !isLoading && BuildingsGrid(data.buildings, navigate);
-=======
   }
 
   if (error) return "Error " + error.message;
@@ -407,5 +369,4 @@ export default function LandingPage() {
     favoriteIds,
     onToggleSave,
   });
->>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
 }
