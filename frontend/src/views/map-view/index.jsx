@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 
 // eslint-disable-next-line camelcase
 const default_center = { lat: 44.4341385, lng: 26.0994483 };
+const LIBRARIES = ["places"];
 
 export function MapViewSeachedBuildings(
   buildings,
@@ -138,15 +139,26 @@ export function MapViewSeachedBuildings(
     },
   ];
 
-  if (id !== undefined) {
-    const center = buildings.find(
-      (building) => building.id === parseInt(id)
-    ).location;
-    // eslint-disable-next-line camelcase
-    default_center.lat = center.latitude;
-    // eslint-disable-next-line camelcase
-    default_center.lng = center.longitude;
+let mapCenter = default_center;
+
+if (id !== undefined) {
+  const foundBuilding = buildings.find(
+    (building) => building.id === parseInt(id)
+  );
+
+  if (
+    foundBuilding &&
+    foundBuilding.location &&
+    foundBuilding.location.latitude &&
+    foundBuilding.location.longitude
+  ) {
+    mapCenter = {
+      lat: foundBuilding.location.latitude,
+      lng: foundBuilding.location.longitude,
+    };
   }
+}
+
 
   return (
     <Flex
@@ -160,7 +172,7 @@ export function MapViewSeachedBuildings(
         {/* Google Map Box */}
         <GoogleMap
           // eslint-disable-next-line camelcase
-          center={default_center}
+          center={mapCenter}
           zoom={15}
           mapContainerStyle={{ width: "100%", height: "100%" }}
           options={{
@@ -276,7 +288,7 @@ export default function MapView() {
   });
 const { isLoaded } = useJsApiLoader({
   googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-  libraries: ["places"],
+  libraries: LIBRARIES,
 });
 
 

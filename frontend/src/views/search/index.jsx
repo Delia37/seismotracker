@@ -7,6 +7,7 @@ import { BuildingsGrid } from "../landing-page/index.jsx";
 import { MapViewSeachedBuildings } from "../map-view/index.jsx";
 import { InfoIcon } from "@chakra-ui/icons";
 import { useJsApiLoader } from "@react-google-maps/api";
+const LIBRARIES = ["places"];
 
 export default function Search({ displayMap }) {
   const [map, setMap] = useState(/** @type google.maps.Map */ (null));
@@ -27,8 +28,8 @@ export default function Search({ displayMap }) {
     setMarkerMap,
   };
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyBM4CEzkbnWFZ84JceDEzWncHQJTApSnOI",
-    libraries: ["places"],
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries: LIBRARIES,
   });
 
   const { isLoading, data, error } = useQuery({

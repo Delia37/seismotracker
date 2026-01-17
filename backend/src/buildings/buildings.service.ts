@@ -38,59 +38,84 @@ export class BuildingsService {
     }
   }
 
-  async create(createBuildingDto: CreateBuildingDto) {
-    try {
-      const { location, ...buildingData } = createBuildingDto;
+async create(createBuildingDto: CreateBuildingDto) {
+  try {
+    const { location, ...buildingData } = createBuildingDto;
 
-      let coordinates = await this.googleMapsService
-        .getCoordinates({
-          street: location.street,
-          number: location.number,
-          city: "Bucharest",
-          state: "RO",
-          postalCode: "",
-        })
-        .catch((err) => {
-          return { lat: 0, lng: 0 };
-        });
+    // 1. Obținem coordonatele
+    const coordinates = await this.googleMapsService.getCoordinates({
+      street: location.street,
+      number: location.number,
+      city: "Bucharest",
+      state: "RO",
+      postalCode: "",
+    });
 
-      const existingBuilding = await this.getBuildingByCoordinates(
-        coordinates.lat,
-        coordinates.lng
-      );
-      if (existingBuilding !== null) {
-        return Promise.reject({
-          statusCode: 409,
-          message: "Building already exists",
-          existingBuilding,
-        });
-      }
-
-      location.longitude = coordinates.lng;
-      location.latitude = coordinates.lat;
-
-      // Generate thumbnail URL using the updated lat and lng values
-      const thumbnail = await this.googleMapsService.getStaticImage({
-        lat: coordinates.lat,
-        lng: coordinates.lng,
-      });
-
-      // Assign the generated thumbnail to the location object
-      location.thumbnail = thumbnail;
-
-      const building = await this.prisma.building.create({
-        data: { ...buildingData, location: { create: { ...location } } },
-      });
-
-      return Promise.resolve({
-        statusCode: 200,
-        message: "Building successfully created.",
-        building,
-      });
-    } catch (e) {
-      return Promise.reject(e);
+    // 2. VALIDARE STRICTĂ coordonate
+    if (
+      !coordinates ||
+      !coordinates.lat ||
+      !coordinates.lng ||
+      coordinates.lat === 0 ||
+      coordinates.lng === 0
+    ) {
+      throw {
+        statusCode: 400,
+        message: "Invalid address. Coordinates could not be determined.",
+      };
     }
+
+    // 3. Verificăm dacă există deja clădire la aceleași coordonate
+    const existingBuilding = await this.getBuildingByCoordinates(
+      coordinates.lat,
+      coordinates.lng
+    );
+
+    if (existingBuilding) {
+      throw {
+        statusCode: 409,
+        message: "Building already exists at this location.",
+        existingBuilding,
+      };
+    }
+
+    // 4. Generăm thumbnail
+    const thumbnail = await this.googleMapsService.getStaticImage({
+      lat: coordinates.lat,
+      lng: coordinates.lng,
+    });
+
+    // 5. Creăm building + location (atomic)
+    const building = await this.prisma.building.create({
+      data: {
+        ...buildingData,
+        buildingStatus: "pending", // sau active, cum vrei
+        location: {
+          create: {
+            street: location.street,
+            number: location.number,
+            sector: location.sector,
+            latitude: coordinates.lat,
+            longitude: coordinates.lng,
+            thumbnail,
+          },
+        },
+      },
+      include: {
+        location: true,
+      },
+    });
+
+    return {
+      statusCode: 200,
+      message: "Building successfully created.",
+      building,
+    };
+  } catch (error) {
+    throw error;
   }
+}
+
 
   findAll(params: {
     skip?: number;
@@ -323,9 +348,9 @@ search(q: string) {
         },
       })
       .then(async (building) => {
-        await this.createNotification(id);
-        await this.getNotify(id);
-        await this.deleteBuildingNotifications(id);
+        // await this.createNotification(id);
+        // await this.getNotify(id);
+        // await this.deleteBuildingNotifications(id);
         return {
           statusCode: 200,
           message: `Building with id ${id} has been updated.`,
@@ -352,9 +377,9 @@ search(q: string) {
           data: { buildingStatus },
         })
         .then(async (building) => {
-          await this.createNotificationStatus(id, buildingStatus);
-          await this.getNotify(id);
-          await this.deleteBuildingNotifications(id);
+          // await this.createNotificationStatus(id, buildingStatus);
+          // await this.getNotify(id);
+          // await this.deleteBuildingNotifications(id);
           resolve(
             `Building with id ${id} has been updated to status ${buildingStatus}`
           );
