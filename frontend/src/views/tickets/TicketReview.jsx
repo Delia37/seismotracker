@@ -25,6 +25,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function PatchStatus(id, toast, navigate, setButtonLoading, adminId) {
   setButtonLoading(true);
+<<<<<<< HEAD
   fetch(`http://localhost:3000/tickets/${id}`, {
     method: "PATCH",
     mode: "cors",
@@ -38,10 +39,29 @@ async function PatchStatus(id, toast, navigate, setButtonLoading, adminId) {
     const data = await res.text();
 
     if (data.includes("updated")) {
+=======
+
+  try {
+    const res = await fetch(`http://localhost:3000/tickets/${id}`, {
+      method: "PATCH",
+      mode: "cors",
+      credentials: "same-origin",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("user")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ isClosed: true, adminId: parseInt(adminId) }),
+    });
+
+    const text = await res.text(); // poate fi JSON, dar nu ne trebuie conținutul
+
+    if (res.ok) {
+>>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
       toast({
         position: "top",
         render: () => (
           <Box color="white" p={3} bg="teal.800" textAlign="center">
+<<<<<<< HEAD
             Actualizarea a reusit! Vei fi redirectat la pagina de cladiri noi.
           </Box>
         ),
@@ -50,10 +70,23 @@ async function PatchStatus(id, toast, navigate, setButtonLoading, adminId) {
       toast.closeAll();
       navigate("/new");
     } else {
+=======
+            Ticket închis cu succes!
+          </Box>
+        ),
+      });
+      await sleep(1500);
+      toast.closeAll();
+      // rămâi pe /tickets sau dă refresh la listă; eu te trimit înapoi pe /tickets
+      navigate("/tickets");
+    } else {
+      // aici e eroare reală (401/500 etc)
+>>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
       toast({
         position: "top",
         render: () => (
           <Box color="white" p={3} bg="pink.800" textAlign="center">
+<<<<<<< HEAD
             Internal server error!
           </Box>
         ),
@@ -63,6 +96,70 @@ async function PatchStatus(id, toast, navigate, setButtonLoading, adminId) {
     }
   });
 }
+=======
+            Eroare la închiderea ticket-ului: {text}
+          </Box>
+        ),
+      });
+      await sleep(2500);
+      setButtonLoading(false);
+    }
+  } catch (e) {
+    toast({
+      position: "top",
+      render: () => (
+        <Box color="white" p={3} bg="pink.800" textAlign="center">
+          Internal server error!
+        </Box>
+      ),
+    });
+    await sleep(2500);
+    setButtonLoading(false);
+  }
+}
+
+
+// async function PatchStatus(id, toast, navigate, setButtonLoading, adminId) {
+//   setButtonLoading(true);
+//   fetch(`http://localhost:3000/tickets/${id}`, {
+//     method: "PATCH",
+//     mode: "cors",
+//     credentials: "same-origin",
+//     headers: {
+//       Authorization: `Bearer ${localStorage.getItem("user")}`,
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify({ isClosed: true, adminId: parseInt(adminId) }),
+//   }).then(async (res) => {
+//     const data = await res.text();
+
+//     if (data.includes("updated")) {
+//       toast({
+//         position: "top",
+//         render: () => (
+//           <Box color="white" p={3} bg="teal.800" textAlign="center">
+//             Actualizarea a reusit! Vei fi redirectat la pagina de cladiri noi.
+//           </Box>
+//         ),
+//       });
+//       await sleep(3000);
+//       toast.closeAll();
+//       navigate("/new");
+//     } else {
+//       toast({
+//         position: "top",
+//         render: () => (
+//           <Box color="white" p={3} bg="pink.800" textAlign="center">
+//             Internal server error!
+//           </Box>
+//         ),
+//       });
+//       await sleep(3000);
+//       setButtonLoading(false);
+//     }
+//   });
+// }
+>>>>>>> 9609889d7b9da60062c3b535cba17cbc715633c5
 // eslint-disable-next-line react/prop-types
 function BuildingForm({ onSubmit, buildingId, ticketId }) {
   const toast = useToast();
