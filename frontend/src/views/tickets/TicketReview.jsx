@@ -19,121 +19,22 @@ import {
   SubmitButton,
 } from "formik-chakra-ui";
 import { useNavigate } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function PatchStatus(id, toast, navigate, setButtonLoading, adminId) {
-  setButtonLoading(true);
-
-  try {
-    const res = await fetch(`http://localhost:3000/tickets/${id}`, {
-      method: "PATCH",
-      mode: "cors",
-      credentials: "same-origin",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("user")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ isClosed: true, adminId: parseInt(adminId) }),
-    });
-
-    const text = await res.text(); // poate fi JSON, dar nu ne trebuie conținutul
-
-    if (res.ok) {
-      toast({
-        position: "top",
-        render: () => (
-          <Box color="white" p={3} bg="teal.800" textAlign="center">
-            Ticket închis cu succes!
-          </Box>
-        ),
-      });
-      await sleep(1500);
-      toast.closeAll();
-      // rămâi pe /tickets sau dă refresh la listă; eu te trimit înapoi pe /tickets
-      navigate("/tickets");
-    } else {
-      // aici e eroare reală (401/500 etc)
-      toast({
-        position: "top",
-        render: () => (
-          <Box color="white" p={3} bg="pink.800" textAlign="center">
-            Eroare la închiderea ticket-ului: {text}
-          </Box>
-        ),
-      });
-      await sleep(2500);
-      setButtonLoading(false);
-    }
-  } catch (e) {
-    toast({
-      position: "top",
-      render: () => (
-        <Box color="white" p={3} bg="pink.800" textAlign="center">
-          Internal server error!
-        </Box>
-      ),
-    });
-    await sleep(2500);
-    setButtonLoading(false);
-  }
-}
-
-
-// async function PatchStatus(id, toast, navigate, setButtonLoading, adminId) {
-//   setButtonLoading(true);
-//   fetch(`http://localhost:3000/tickets/${id}`, {
-//     method: "PATCH",
-//     mode: "cors",
-//     credentials: "same-origin",
-//     headers: {
-//       Authorization: `Bearer ${localStorage.getItem("user")}`,
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({ isClosed: true, adminId: parseInt(adminId) }),
-//   }).then(async (res) => {
-//     const data = await res.text();
-
-//     if (data.includes("updated")) {
-//       toast({
-//         position: "top",
-//         render: () => (
-//           <Box color="white" p={3} bg="teal.800" textAlign="center">
-//             Actualizarea a reusit! Vei fi redirectat la pagina de cladiri noi.
-//           </Box>
-//         ),
-//       });
-//       await sleep(3000);
-//       toast.closeAll();
-//       navigate("/new");
-//     } else {
-//       toast({
-//         position: "top",
-//         render: () => (
-//           <Box color="white" p={3} bg="pink.800" textAlign="center">
-//             Internal server error!
-//           </Box>
-//         ),
-//       });
-//       await sleep(3000);
-//       setButtonLoading(false);
-//     }
-//   });
-// }
-// eslint-disable-next-line react/prop-types
 function BuildingForm({ onSubmit, buildingId, ticketId }) {
   const toast = useToast();
   const navigate = useNavigate();
-  // eslint-disable-next-line no-unused-vars
   const [buttonLoading, setButtonLoading] = useState(false);
 
   const { isLoading, data, error } = useQuery({
     queryKey: [`Building_${buildingId}`],
     queryFn: () =>
-      fetch(`http://localhost:3000/buildings/${buildingId}`).then(async (res) =>
+      fetch(`http://localhost:3000/buildings/${buildingId}`).then((res) =>
         res.json()
       ),
+    enabled: !!buildingId, // NU face fetch dacă buildingId e falsy
   });
 
   if (isLoading)
@@ -142,30 +43,40 @@ function BuildingForm({ onSubmit, buildingId, ticketId }) {
         <Spinner />
       </Box>
     );
-  if (error) return "Error" + error.message;
-  // eslint-disable-next-line no-unmodified-loop-condition
+
+  if (error)
+    return (
+      <Box p={15} color="red.500">
+        Error: {error.message || "Internal server error"}
+      </Box>
+    );
+
+  if (!data)
+    return (
+      <Box p={15} color="gray.600">
+        Cladirea nu există
+      </Box>
+    );
 
   const initialValues = {
-    buildingYear: data.buildingYear,
-    heightRegime: data.heightRegime,
-    numApartments: data.numApartments,
-    analysisYear: data.analysisYear,
-    technicExpert: data.technicExpert,
-    seismicRiskId: data.seismicRiskId,
+    buildingYear: data.buildingYear || "",
+    heightRegime: data.heightRegime || "",
+    numApartments: data.numApartments || "",
+    analysisYear: data.analysisYear || "",
+    technicExpert: data.technicExpert || "",
+    seismicRiskId: data.seismicRiskId || "",
     location: {
-      street: data.location.street,
-      number: data.location.number,
-      sector: data.location.sector,
+      street: data.location?.street || "",
+      number: data.location?.number || "",
+      sector: data.location?.sector || "",
     },
   };
 
-  const sectors = [];
-  for (let i = 1; i <= 6; i++) {
-    sectors.push(i);
-  }
+  const sectors = Array.from({ length: 6 }, (_, i) => i + 1);
+
   return (
     <Formik onSubmit={onSubmit} initialValues={initialValues}>
-      {({ handleSubmit, values, errors }) => (
+      {({ handleSubmit }) => (
         <Box
           borderWidth="1px"
           rounded="lg"
@@ -221,15 +132,8 @@ function BuildingForm({ onSubmit, buildingId, ticketId }) {
           <SubmitButton
             bg="pink.500"
             mt={5}
-            onClick={() =>
-              PatchStatus(
-                ticketId,
-                toast,
-                navigate,
-                setButtonLoading,
-                localStorage.getItem("userId")
-              )
-            }
+            isLoading={buttonLoading}
+            onClick={() => setButtonLoading(true)}
           >
             Trimite
           </SubmitButton>
@@ -239,79 +143,12 @@ function BuildingForm({ onSubmit, buildingId, ticketId }) {
   );
 }
 
-async function SendBuildingForm(values, toast, navigate, id) {
-  fetch(`http://localhost:3000/buildings/${id}`, {
-    method: "PATCH",
-    mode: "cors",
-    credentials: "same-origin",
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("user")}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(values),
-  }).then(async (res) => {
-    const response = JSON.parse(await res.text());
-    if (response.statusCode === 200) {
-      toast({
-        position: "top",
-        render: () => (
-          <Box color="white" p={3} bg="teal.800" textAlign="center">
-            Editarea a reusit! Vei fi redirectat la Home!
-          </Box>
-        ),
-      });
-      await sleep(3000);
-      toast.closeAll();
-      navigate("/");
-    } else if (response.statusCode === 409) {
-      toast({
-        position: "top",
-        render: () => (
-          <Box color="white" p={3} bg="pink.500" textAlign="center">
-            Locatia este deja folosita!
-          </Box>
-        ),
-      });
-    }
-  });
-}
-export function TicketReview({
-  isOpen,
-  onClose,
-  onOpen,
-  buildingId,
-  ticketId,
-}) {
-  const toast = useToast();
-  const navigate = useNavigate();
-  const { mutate } = useMutation((variable) =>
-    SendBuildingForm(variable, toast, navigate, buildingId)
-  );
-  const onSubmit = (values, { setSubmitting }) => {
-    values.buildingYear = parseInt(values.buildingYear);
-    values.analysisYear = parseInt(values.analysisYear);
-    values.seismicRiskId = parseInt(values.seismicRiskId);
-    values.numApartments = parseInt(values.numApartments);
-    values.location.sector = parseInt(values.location.sector);
-
-    values.userId = parseInt(localStorage.getItem("userId"));
-    mutate(values);
-
-    Object.keys(values).forEach((key) => {
-      if (values[key] === "") {
-        delete values[key];
-      }
-      if (key === "location") {
-        if (values[key].street === "") {
-          delete values[key];
-        }
-      }
-    });
-    sleep(4000).then(() => setSubmitting(false));
-  };
+export function TicketReview({ isOpen, onClose, buildingId, ticketId }) {
+  // Dacă modalul nu e deschis sau nu există buildingId, nu montăm componenta
+  if (!isOpen || !buildingId) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} size="xl" scrollBehavior="inside">
       <ModalOverlay />
       <ModalContent maxH="800px" maxW="800px" p={10}>
         <Box
@@ -322,14 +159,14 @@ export function TicketReview({
           mt={10}
           p={5}
           rounded="md"
-          overflowY="scroll"
+          overflowY="auto"
         >
           <ModalCloseButton />
-          <Heading>Modifica o cladire</Heading>
+          <Heading mb={4}>Modifica o cladire</Heading>
           <BuildingForm
-            onSubmit={onSubmit}
             buildingId={buildingId}
             ticketId={ticketId}
+            onSubmit={() => {}}
           />
         </Box>
       </ModalContent>
@@ -340,7 +177,6 @@ export function TicketReview({
 TicketReview.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  onOpen: PropTypes.func.isRequired,
   buildingId: PropTypes.number.isRequired,
   ticketId: PropTypes.number.isRequired,
 };
