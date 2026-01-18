@@ -28,6 +28,8 @@ import {
 import { GrMapLocation } from "react-icons/gr";
 import PropTypes from "prop-types";
 import { Field, Formik } from "formik";
+import { FcBarChart } from "react-icons/fc";
+
 
 const navbarItems = [
   {
@@ -79,6 +81,14 @@ const navbarItems = [
     shouldBeLoggedIn: true,
     shouldBeAdmin: true,
   },
+  {
+    label: "Dashboard",
+    icon: <FcBarChart />,
+    page: "/dashboard",
+    shouldBeLoggedIn: true,
+    shouldBeAdmin: true,
+  },
+
 ];
 
 function renderSearchButton(navigate) {

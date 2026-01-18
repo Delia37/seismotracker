@@ -14,6 +14,8 @@ import Unauthorized from "../views/unauthorized/index.jsx";
 import Ticket from "../views/tickets/index.jsx";
 import MyBuildings from "../views/my_buildings/index.jsx";
 import SavedBuildings from "../views/saved_buildings/index.jsx";
+import Dashboard from "../views/dashboard/index.jsx";
+
 
 
 function generateRoutes() {
@@ -67,6 +69,18 @@ function generateRoutes() {
               <Unauthorized />
             ),
         },
+
+        {
+          path: "/dashboard",
+          element:
+            localStorage.getItem("isAdmin") === "true" &&
+            localStorage.getItem("user") !== null ? (
+              <Dashboard />
+            ) : (
+              <Unauthorized />
+            ),
+        },
+
 
       ],
     },

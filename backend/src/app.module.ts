@@ -9,6 +9,7 @@ import { BuildingsModule } from "./buildings/buildings.module";
 import { NotificationModule } from "./notifications/notification.module";
 import { LocationModule } from "./location/location.module";
 import { TicketsModule } from "./tickets/tickets.module";
+import { DashboardModule } from "./dashboard/dashboard.module";
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { TicketsModule } from "./tickets/tickets.module";
     NotificationModule,
     LocationModule,
     TicketsModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
