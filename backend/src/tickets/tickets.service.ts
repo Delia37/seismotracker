@@ -61,10 +61,7 @@ export class TicketsService {
   async getTicketsByUserId(userId: number): Promise<Ticket[]> {
     return this.prisma.ticket.findMany({
       where: {
-        OR: [
-          { userId: userId },   // tichete create de user
-          { adminId: userId },  // tichete repartizate adminului
-        ],
+        userId: userId,
       },
       include: {
         user: true,
